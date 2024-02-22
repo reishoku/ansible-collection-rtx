@@ -1,0 +1,22 @@
+name: Lint and Format code
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prettify_code:
+    name: Lint and Format code
+    runs-on: ubuntu-jammy
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Setup Python environment
+        uses: actions/setup-python@v4
+      - name: Install dependencies
+        run:  python3 -m pip install --upgrade pip ruff
+      - name: Lint with Ruff
+        run: |
+          find . -type f -name '*.py' -exec ruff --output-format=github {} \;
+        continue-on-error: true
