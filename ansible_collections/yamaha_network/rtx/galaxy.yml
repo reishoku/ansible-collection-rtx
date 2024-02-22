@@ -9,7 +9,7 @@ namespace: yamaha_network
 name: rtx
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 1.0.1
+version: 1.0.1~reishoku.0.0.1
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -18,11 +18,12 @@ readme: README.md
 # @nicks:irc/im.site#channel'
 authors:
 - Yamaha Corporation
+- reishoku
 
 ### OPTIONAL but strongly recommended
 
 # A short summary description of the collection
-description: Ansible collection for Yamaha RTX/NVR/FWX/vRX series
+description: A fork of Ansible collection for Yamaha RTX/NVR/FWX/vRX series
 
 # Either a single license or a list of licenses for content inside of a collection. Ansible Galaxy currently only
 # accepts L(SPDX,https://spdx.org/licenses/) licenses. This key is mutually exclusive with 'license_file'
@@ -44,7 +45,7 @@ dependencies:
   ansible.netcommon: ">=2.0.0"
 
 # The URL of the originating SCM repository
-repository: https://github.com/yamaha-network/ansible-collection-rtx
+repository: https://github.com/reishoku/ansible-collection-rtx
 
 # The URL to any online docs
 documentation: http://www.rtpro.yamaha.co.jp/RT/docs/ansible/index.html

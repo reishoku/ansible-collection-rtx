@@ -1,6 +1,6 @@
 # Ansible collection for Yamaha RTX/NVR/FWX/vRX series
 
-このリポジトリはヤマハネットワーク製品向けAnsibleモジュールリポジトリです。
+このリポジトリは[ヤマハネットワーク製品向けAnsibleモジュールリポジトリ](https://github.com/yamaha-network/ansible-collection-rtx)の**フォークです**。
 
 ## Modules
 - rtx_command.py-ヤマハ機器(RTX/NVR/FWX/vRX)の実行系コマンドを実行するためのモジュール
@@ -18,7 +18,8 @@
 >ansible-galaxy collection install ansible.netcommon
 
 ## Requirements
-- Ansible 2.10
+- Ansible 2.10 or higher
+    - Python 3.11.7 (macOS Sonoma ARM64, Homebrew)と`ansible-core==2.16.3`, `ansible-pylibssh==1.1.0`, `paramiko==3.4.0`での動作を確認しています(が、動作を保証するものではありません)。
 
 ### Supported connections
 Yamaha rtx collectionは``network_cli``を用いた接続をサポートします。
