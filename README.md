@@ -1,4 +1,4 @@
-# Ansible collection for Yamaha RTX/NVR/FWX/vRX series
+# (A fork of) Ansible collection for Yamaha RTX/NVR/FWX/vRX series
 
 このリポジトリは[ヤマハネットワーク製品向けAnsibleモジュールリポジトリ](https://github.com/yamaha-network/ansible-collection-rtx)の**フォークです**。
 
