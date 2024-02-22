@@ -48,14 +48,26 @@ class TerminalModule(TerminalBase):
         if self._get_prompt().endswith(b'#'):
             return
 
-        cmd = {u'command': u'administrator'}
+        cmd = {
+            u'command': u'administrator'
+        }
         if passwd:
-            cmd[u'prompt'] = to_text(r"[\r\n]?Password: $", errors='surrogate_or_strict')
+            cmd[u'prompt'] = to_text(
+                r"[\r\n]?Password: $",
+                errors='surrogate_or_strict'
+            )
             cmd[u'answer'] = passwd
         try:
-            self._exec_cli_command(to_bytes(json.dumps(cmd), errors='surrogate_or_strict'))
+            self._exec_cli_command(
+                to_bytes(
+                    json.dumps(cmd),
+                    errors='surrogate_or_strict'
+                )
+            )
         except AnsibleConnectionFailure:
-            raise AnsibleConnectionFailure('unable to elevate privilege to administrator mode')
+            raise AnsibleConnectionFailure(
+                    'unable to elevate privilege to administrator mode'
+                  )
 
     def on_unbecome(self):
         prompt = self._get_prompt()

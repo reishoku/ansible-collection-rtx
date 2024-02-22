@@ -21,9 +21,11 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
+ANSIBLE_METADATA = {
+    'metadata_version': '1.1',
+    'status': ['preview'],
+    'supported_by': 'community'
+}
 
 
 DOCUMENTATION = """
@@ -283,9 +285,13 @@ def edit_config_or_macro(connection, commands):
     # only catch the macro configuration command,
     # not negated 'no' variation.
     if commands[0].startswith("macro"):
-        connection.edit_macro(candidate=commands)
+        connection.edit_macro(
+            candidate=commands
+        )
     else:
-        connection.edit_config(candidate=commands)
+        connection.edit_config(
+            candidate=commands
+        )
 
 
 def get_candidate_config(module):
@@ -296,8 +302,14 @@ def get_candidate_config(module):
     elif module.params['lines']:
         candidate_obj = NetworkConfig(indent=1)
         parents = module.params['parents'] or list()
-        candidate_obj.add(module.params['lines'], parents=parents)
-        candidate = dumps(candidate_obj, 'raw')
+        candidate_obj.add(
+            module.params['lines'],
+            parents=parents
+        )
+        candidate = dumps(
+            candidate_obj,
+            'raw'
+        )
 
     return candidate
 
@@ -308,7 +320,10 @@ def get_running_config(module, current_config=None, flags=None):
         if current_config:
             running = current_config
         else:
-            running = get_config(module, flags=flags)
+            running = get_config(
+                module,
+                flags=flags
+            )
 
     return running
 
@@ -316,11 +331,16 @@ def get_running_config(module, current_config=None, flags=None):
 def save_config(module, result):
     result['changed'] = True
     if not module.check_mode:
-        run_commands(module, 'save\r')
+        run_commands(
+            module,
+            'save\r'
+        )
     else:
-        module.warn('Skipping command `save` '
-                    'due to check_mode.  Configuration not copied to '
-                    'non-volatile storage')
+        module.warn(
+            'Skipping command `save` '
+            'due to check_mode.  Configuration not copied to '
+            'non-volatile storage'
+        )
 
 
 def main():
@@ -333,39 +353,83 @@ def main():
     argument_spec = dict(
         src=dict(type='path'),
 
-        lines=dict(aliases=['commands'], type='list', elements="str"),
-        parents=dict(type='list', elements="str"),
+        lines=dict(
+            aliases=['commands'],
+            type='list',
+            elements="str"
+        ),
+        parents=dict(
+            type='list',
+            elements="str"
+        ),
 
-        before=dict(type='list', elements="str"),
-        after=dict(type='list', elements="str"),
+        before=dict(
+            type='list',
+            elements="str"
+        ),
+        after=dict(
+            type='list',
+            elements="str"
+        ),
 
-        match=dict(default='line', choices=['line', 'strict', 'exact', 'none']),
-        replace=dict(default='line', choices=['line', 'block']),
+        match=dict(
+            default='line',
+            choices=['line', 'strict', 'exact', 'none']
+        ),
+        replace=dict(
+            default='line',
+            choices=['line', 'block']
+        ),
 
-        running_config=dict(aliases=['config']),
+        running_config=dict(
+            aliases=['config']
+        ),
         intended_config=dict(),
 
-        backup=dict(type='bool', default=False),
-        backup_options=dict(type='dict', options=backup_spec),
-        save_when=dict(choices=['always', 'never', 'changed'], default='never'),
+        backup=dict(
+            type='bool',
+            default=False
+        ),
+        backup_options=dict(
+            type='dict',
+            options=backup_spec
+        ),
+        save_when=dict(
+            choices=['always', 'never', 'changed'],
+            default='never'
+        ),
 
-        diff_against=dict(choices=['intended', 'running']),
-        diff_ignore_lines=dict(type='list', elements="str"),
+        diff_against=dict(
+            choices=['intended', 'running']
+        ),
+        diff_ignore_lines=dict(
+            type='list',
+            elements="str"
+        ),
     )
-    mutually_exclusive = [('lines', 'src'),
-                          ('parents', 'src')]
+    mutually_exclusive = [
+        ('lines', 'src'),
+        ('parents', 'src')
+    ]
 
-    required_if = [('match', 'strict', ['lines']),
-                   ('match', 'exact', ['lines']),
-                   ('replace', 'block', ['lines']),
-                   ('diff_against', 'intended', ['intended_config'])]
+    required_if = [
+        ('match', 'strict', ['lines']),
+        ('match', 'exact', ['lines']),
+        ('replace', 'block', ['lines']),
+        ('diff_against', 'intended', ['intended_config'])
+    ]
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           mutually_exclusive=mutually_exclusive,
-                           required_if=required_if,
-                           supports_check_mode=True)
+    module = \
+        AnsibleModule(
+            argument_spec=argument_spec,
+            mutually_exclusive=mutually_exclusive,
+            required_if=required_if,
+            supports_check_mode=True
+        )
 
-    result = {'changed': False}
+    result = {
+        'changed': False
+    }
 
     warnings = list()
     result['warnings'] = warnings
@@ -379,9 +443,16 @@ def main():
     console_info = get_console_info(module)
     set_console_info(module)
 
-    if module.params['backup'] or (module._diff and module.params['diff_against'] == 'running'):
-        contents = get_config(module, flags=flags)
-        config = NetworkConfig(indent=1, contents=contents)
+    if module.params['backup'] or \
+       (module._diff and module.params['diff_against'] == 'running'):
+        contents = get_config(
+            module,
+            flags=flags
+        )
+        config = NetworkConfig(
+            indent=1,
+            contents=contents
+        )
         if module.params['backup']:
             result['__backup__'] = contents
 
@@ -393,15 +464,32 @@ def main():
         candidate = get_candidate_config(module)
         running = get_running_config(module, contents, flags=flags)
         if module.params['lines']:
-            console_info = update_console_info(module.params['lines'], console_info)
+            console_info = update_console_info(
+                module.params['lines'],
+                console_info
+            )
         elif module.params['src']:
-            console_info = update_console_info(module.params['src'], console_info)
+            console_info = update_console_info(
+                module.params['src'],
+                console_info
+            )
 
         try:
-            response = connection.get_diff(candidate=candidate, running=running, diff_match=match, diff_ignore_lines=diff_ignore_lines, path=path,
-                                           diff_replace=replace)
+            response = connection.get_diff(
+                        candidate=candidate,
+                        running=running,
+                        diff_match=match,
+                        diff_ignore_lines=diff_ignore_lines,
+                        path=path,
+                        diff_replace=replace
+                    )
         except ConnectionError as exc:
-            module.fail_json(msg=to_text(exc, errors='surrogate_then_replace'))
+            module.fail_json(
+                msg=to_text(
+                    exc,
+                    errors='surrogate_then_replace'
+                )
+            )
 
         config_diff = response['config_diff']
 
@@ -412,7 +500,9 @@ def main():
                 commands[:0] = module.params['before']
 
             if module.params['after']:
-                commands.extend(module.params['after'])
+                commands.extend(
+                    module.params['after']
+                )
 
             result['commands'] = commands
             result['updates'] = commands
@@ -421,13 +511,19 @@ def main():
             # them with the current running config
             if not module.check_mode:
                 if commands:
-                    edit_config_or_macro(connection, commands)
+                    edit_config_or_macro(
+                        connection,
+                        commands
+                    )
 
             result['changed'] = True
 
     running_config = module.params['running_config']
     if not running_config:
-        output = run_commands(module, 'show config')
+        output = run_commands(
+            module,
+            'show config'
+        )
         running_config = output[0]
 
     set_console_info(module, console_info)
@@ -442,11 +538,17 @@ def main():
         contents = running_config
 
         # recreate the object in order to process diff_ignore_lines
-        running_config = NetworkConfig(indent=1, contents=contents, ignore_lines=diff_ignore_lines)
+        running_config = NetworkConfig(
+            indent=1,
+            contents=contents,
+            ignore_lines=diff_ignore_lines
+        )
 
         if module.params['diff_against'] == 'running':
             if module.check_mode:
-                module.warn("unable to perform diff against running-config due to check mode")
+                module.warn(
+                    'unable to perform diff against running-config due to check mode'
+                )
                 contents = None
             else:
                 contents = config.config_text
@@ -455,12 +557,19 @@ def main():
             contents = module.params['intended_config']
 
         if contents is not None:
-            base_config = NetworkConfig(indent=1, contents=contents, ignore_lines=diff_ignore_lines)
+            base_config = NetworkConfig(
+                indent=1,
+                contents=contents,
+                ignore_lines=diff_ignore_lines
+            )
 
             if running_config.sha1 != base_config.sha1:
                 result.update({
                     'changed': True,
-                    'diff': {'before': str(base_config), 'after': str(running_config)}
+                    'diff': {
+                        'before': str(base_config),
+                        'after': str(running_config)
+                    }
                 })
 
     module.exit_json(**result)

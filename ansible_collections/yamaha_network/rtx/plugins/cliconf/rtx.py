@@ -48,26 +48,44 @@ from ansible.plugins.cliconf import CliconfBase, enable_mode
 
 
 class Cliconf(CliconfBase):
-
     @enable_mode
-    def get_config(self, source='running', flags=None, format=None):
+    def get_config(
+        self,
+        source='running',
+        flags=None,
+        format=None
+    ):
         if source not in ('running', 'startup'):
-            raise ValueError("fetching configuration from %s is not supported" % source)
+            raise ValueError(
+                'fetching configuration from {} is not supported'.format(source)
+            )
 
         if format:
-            raise ValueError("'format' value %s is not supported for get_config" % format)
+            raise ValueError(
+                '\'format\' value {} is not supported for get_config'.format(format)
+            )
 
         if not flags:
             flags = []
 
         cmd = 'show config '
 
-        cmd += ' '.join(to_list(flags))
+        cmd += ' '.join(
+            to_list(flags)
+        )
         cmd = cmd.strip()
 
         return self.send_command(cmd)
 
-    def get_diff(self, candidate=None, running=None, diff_match='line', diff_ignore_lines=None, path=None, diff_replace='line'):
+    def get_diff(
+        self,
+        candidate=None,
+        running=None,
+        diff_match='line',
+        diff_ignore_lines=None,
+        path=None,
+        diff_replace='line'
+    ):
         """
         Generate diff between candidate and running configuration. If the
         remote host supports onbox diff capabilities ie. supports_onbox_diff in that case
@@ -106,13 +124,25 @@ class Cliconf(CliconfBase):
         option_values = self.get_option_values()
 
         if candidate is None and device_operations['supports_generate_diff']:
-            raise ValueError("candidate configuration is required to generate diff")
+            raise ValueError(
+                "candidate configuration is required to generate diff"
+            )
 
         if diff_match not in option_values['diff_match']:
-            raise ValueError("'match' value %s in invalid, valid values are %s" % (diff_match, ', '.join(option_values['diff_match'])))
+            raise ValueError(
+                '\'match\' value {} in invalid, valid values are {}'.format(
+                    diff_match,
+                    ', '.join(option_values['diff_match'])
+                )
+            )
 
         if diff_replace not in option_values['diff_replace']:
-            raise ValueError("'replace' value %s in invalid, valid values are %s" % (diff_replace, ', '.join(option_values['diff_replace'])))
+            raise ValueError(
+                '\'replace\' value {} in invalid, valid values are {}'.format(
+                    diff_replace,
+                    ', '.join(option_values['diff_replace'])
+                )
+            )
 
         # prepare candidate configuration
         candidate_obj = NetworkConfig(indent=1)
@@ -120,9 +150,17 @@ class Cliconf(CliconfBase):
 
         if running and diff_match != 'none':
             # running configuration
-            running_obj = NetworkConfig(indent=1, contents=running, ignore_lines=diff_ignore_lines)
-            configdiffobjs = candidate_obj.difference(running_obj, path=path, match=diff_match, replace=diff_replace)
-
+            running_obj = NetworkConfig(
+                indent=1,
+                contents=running,
+                ignore_lines=diff_ignore_lines
+            )
+            configdiffobjs = candidate_obj.difference(
+                running_obj,
+                path=path,
+                match=diff_match,
+                replace=diff_replace
+            )
         else:
             configdiffobjs = candidate_obj.items
 
@@ -130,10 +168,22 @@ class Cliconf(CliconfBase):
         return diff
 
     @enable_mode
-    def edit_config(self, candidate=None, commit=True, replace=None, comment=None):
+    def edit_config(
+        self,
+        candidate=None,
+        commit=True,
+        replace=None,
+        comment=None
+    ):
         resp = {}
         operations = self.get_device_operations()
-        self.check_edit_config_capability(operations, candidate, commit, replace, comment)
+        self.check_edit_config_capability(
+            operations,
+            candidate,
+            commit,
+            replace,
+            comment
+        )
 
         results = []
         requests = []
@@ -146,18 +196,31 @@ class Cliconf(CliconfBase):
                 if cmd != 'exit':
                     results.append(self.send_command(**line))
                     requests.append(cmd)
-
         else:
-            raise ValueError('check mode is not supported')
+            raise ValueError(
+                'check mode is not supported'
+            )
 
         resp['request'] = requests
         resp['response'] = results
         return resp
 
-    def edit_macro(self, candidate=None, commit=True, replace=None, comment=None):
+    def edit_macro(
+        self,
+        candidate=None,
+        commit=True,
+        replace=None,
+        comment=None
+    ):
         resp = {}
         operations = self.get_device_operations()
-        self.check_edit_config_capability(operations, candidate, commit, replace, comment)
+        self.check_edit_config_capability(
+            operations,
+            candidate,
+            commit,
+            replace,
+            comment
+        )
 
         results = []
         requests = []
@@ -169,22 +232,47 @@ class Cliconf(CliconfBase):
                 obj = {'command': commands, 'sendonly': True}
             results.append(self.send_command(**obj))
             requests.append(commands)
-            self.send_command('EOM', sendonly=True)
+            self.send_command(
+                'EOM',
+                sendonly=True
+            )
             time.sleep(0.1)
-            results.append(self.send_command('\n'))
+            results.append(
+                self.send_command('\n')
+            )
             requests.append('\n')
 
         resp['request'] = requests
         resp['response'] = results
         return resp
 
-    def get(self, command=None, prompt=None, answer=None, sendonly=False, output=None, newline=True, check_all=False):
+    def get(
+        self,
+        command=None,
+        prompt=None,
+        answer=None,
+        sendonly=False,
+        output=None,
+        newline=True,
+        check_all=False
+    ):
         if not command:
-            raise ValueError('must provide value of command to execute')
+            raise ValueError(
+                'must provide value of command to execute'
+            )
         if output:
-            raise ValueError("'output' value %s is not supported for get" % output)
+            raise ValueError(
+                '\'output\' value {} is not supported for get'.format(output)
+            )
 
-        return self.send_command(command=command, prompt=prompt, answer=answer, sendonly=sendonly, newline=newline, check_all=check_all)
+        return self.send_command(
+            command=command,
+            prompt=prompt,
+            answer=answer,
+            sendonly=sendonly,
+            newline=newline,
+            check_all=check_all
+        )
 
     def get_device_info(self):
         device_info = {}
@@ -235,14 +323,21 @@ class Cliconf(CliconfBase):
 
     def get_capabilities(self):
         result = super(Cliconf, self).get_capabilities()
-        result['rpc'] += ['get_diff', 'run_commands']
+        result['rpc'] += [
+            'get_diff',
+            'run_commands'
+        ]
         result['device_operations'] = self.get_device_operations()
-        result.update(self.get_option_values())
+        result.update(
+            self.get_option_values()
+        )
         return json.dumps(result)
 
     def run_commands(self, commands=None, check_rc=True):
         if commands is None:
-            raise ValueError("'commands' value is required")
+            raise ValueError(
+                '\'commands\' value is required'
+            )
 
         responses = list()
         for cmd in to_list(commands):
@@ -251,14 +346,20 @@ class Cliconf(CliconfBase):
 
             output = cmd.pop('output', None)
             if output:
-                raise ValueError("'output' value %s is not supported for run_commands" % output)
+                raise ValueError(
+                    '\'output\' value {} is not supported for run_commands'.format(output)
+                )
 
             try:
                 out = self.send_command(**cmd)
             except AnsibleConnectionFailure as e:
                 if check_rc:
                     raise
-                out = getattr(e, 'err', to_text(e))
+                out = getattr(
+                    e,
+                    'err',
+                    to_text(e)
+                )
 
             responses.append(out)
 

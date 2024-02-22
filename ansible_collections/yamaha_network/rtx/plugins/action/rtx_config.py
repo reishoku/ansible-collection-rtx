@@ -27,13 +27,13 @@ import copy
 from ansible.module_utils._text import to_text
 from ansible.module_utils.connection import Connection, ConnectionError
 from ansible.utils.display import Display
-from ansible_collections.ansible.netcommon.plugins.action.network import ActionModule as ActionNetworkModule
+from ansible_collections.ansible.netcommon.plugins.action.network \
+    import ActionModule as ActionNetworkModule
 
 display = Display()
 
 
 class ActionModule(ActionNetworkModule):
-
     def run(self, tmp=None, task_vars=None):
         del tmp  # tmp no longer has any effect
 
@@ -45,12 +45,21 @@ class ActionModule(ActionNetworkModule):
         socket_path = None
 
         if self._play_context.connection == 'network_cli':
-            provider = self._task.args.get('provider', {})
+            provider = \
+                self._task.args.get(
+                    'provider', {}
+                )
             if any(provider.values()):
-                display.warning('provider is unnecessary when using network_cli and will be ignored')
+                display.warning(
+                    'provider is unnecessary when using network_cli and will be ignored'
+                )
                 del self._task.args['provider']
         else:
-            return {'failed': True, 'msg': 'Connection type %s is not valid for this module' % self._play_context.connection}
+            return {
+                'failed': True,
+                'msg': 'Connection type {} is not valid for this module'.format(
+                           self._play_context.connection
+                       )
+            }
 
-        result = super(ActionModule, self).run(task_vars=task_vars)
-        return result
+        return super(ActionModule, self).run(task_vars=task_vars)

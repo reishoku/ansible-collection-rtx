@@ -21,9 +21,11 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
+ANSIBLE_METADATA = {
+    'metadata_version': '1.1',
+    'status': ['preview'],
+    'supported_by': 'community'
+}
 
 DOCUMENTATION = """
 module: rtx_command
@@ -159,7 +161,7 @@ def parse_commands(module, warnings):
             if not item['command'].startswith('show'):
                 warnings.append(
                     'Only show commands are supported when using check mode, not '
-                    'executing %s' % item['command']
+                    'executing {}'.format(item['command'])
                 )
                 commands.remove(item)
     return commands
@@ -169,26 +171,57 @@ def main():
     """main entry point for module execution
     """
     argument_spec = dict(
-        commands=dict(type='list', elements="raw", required=True),
-        wait_for=dict(type='list', elements="str", aliases=['waitfor']),
-        match=dict(default='all', choices=['all', 'any']),
-        retries=dict(default=10, type='int'),
-        interval=dict(default=1, type='int')
+        commands=dict(
+            type='list',
+            elements="raw",
+            required=True
+        ),
+        wait_for=dict(
+            type='list',
+            elements="str",
+            aliases=[
+                'waitfor'
+            ]
+        ),
+        match=dict(
+            default='all',
+            choices=['all', 'any']
+        ),
+        retries=dict(
+            default=10,
+            type='int'
+        ),
+        interval=dict(
+            default=1,
+            type='int'
+        )
     )
     module = AnsibleModule(
-        argument_spec=argument_spec, supports_check_mode=True
+        argument_spec=argument_spec,
+        supports_check_mode=True
     )
 
     warnings = list()
-    result = {'changed': False, 'warnings': warnings}
-    check_args(module, warnings)
-    commands = parse_commands(module, warnings)
+    result = {
+        'changed': False,
+        'warnings': warnings
+    }
+    check_args(
+        module,
+        warnings
+    )
+    commands = parse_commands(
+        module,
+        warnings
+    )
     wait_for = module.params['wait_for'] or list()
 
     try:
         conditionals = [Conditional(c) for c in wait_for]
     except AttributeError as exc:
-        module.fail_json(msg=to_text(exc))
+        module.fail_json(
+                msg=to_text(exc)
+        )
 
     retries = module.params['retries']
     interval = module.params['interval']
@@ -213,13 +246,22 @@ def main():
         time.sleep(interval)
         retries -= 1
 
-    console_info = update_console_info(module.params['commands'], console_info)
-    set_console_info(module, console_info)
+    console_info = update_console_info(
+        module.params['commands'],
+        console_info
+    )
+    set_console_info(
+        module,
+        console_info
+    )
 
     if conditionals:
         failed_conditions = [item.raw for item in conditionals]
         msg = 'One or more conditional statements have not been satisfied'
-        module.fail_json(msg=msg, failed_conditions=failed_conditions)
+        module.fail_json(
+            msg=msg,
+            failed_conditions=failed_conditions
+        )
 
     result.update({
         'stdout': responses,

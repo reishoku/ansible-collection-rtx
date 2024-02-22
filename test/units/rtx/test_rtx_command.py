@@ -30,91 +30,149 @@ from units.modules.network.rtx.rtx_module import TestRtxModule, load_fixture
 
 
 class TestRtxCommandModule(TestRtxModule):
-
     module = rtx_command
 
     def setUp(self):
-        super(TestRtxCommandModule, self).setUp()
+        super(
+            TestRtxCommandModule,
+            self
+        ).setUp()
 
-        self.mock_run_commands = patch('ansible_collections.yamaha_network.rtx.plugins.modules.rtx_command.run_commands')
-        self.run_commands = self.mock_run_commands.start()
+        self.mock_run_commands = \
+            patch(
+                'ansible_collections.yamaha_network.rtx.plugins.modules.rtx_command.run_commands'
+            )
+        self.run_commands = \
+            self.mock_run_commands.start()
 
-        self.mock_get_console_info = patch('ansible_collections.yamaha_network.rtx.plugins.modules.rtx_command.get_console_info')
-        self.get_console_info = self.mock_get_console_info.start()
+        self.mock_get_console_info = \
+            patch(
+                'ansible_collections.yamaha_network.rtx.plugins.modules.rtx_command.get_console_info'
+            )
+        self.get_console_info = \
+            self.mock_get_console_info.start()
 
-        self.mock_set_console_info = patch('ansible_collections.yamaha_network.rtx.plugins.modules.rtx_command.set_console_info')
-        self.set_console_info = self.mock_set_console_info.start()
+        self.mock_set_console_info = \
+            patch(
+                'ansible_collections.yamaha_network.rtx.plugins.modules.rtx_command.set_console_info'
+            )
+        self.set_console_info = \
+            self.mock_set_console_info.start()
 
     def tearDown(self):
-        super(TestRtxCommandModule, self).tearDown()
+        super(
+            TestRtxCommandModule,
+            self
+        ).tearDown()
         self.mock_run_commands.stop()
         self.mock_get_console_info.stop()
         self.mock_set_console_info.stop()
 
     def load_fixtures(self, commands=None):
-
         def load_from_file(*args, **kwargs):
             module, commands = args
             output = list()
 
             for item in commands:
                 try:
-                    obj = json.loads(item['command'])
+                    obj = json.loads(
+                        item['command']
+                    )
                     command = obj['command']
                 except ValueError:
                     command = item['command']
                 filename = str(command).replace(' ', '_')
-                output.append(load_fixture(filename))
+                output.append(
+                    load_fixture(filename)
+                )
             return output
 
         self.run_commands.side_effect = load_from_file
 
     def test_rtx_command_simple(self):
-        set_module_args(dict(commands=['show environment']))
+        set_module_args(dict(
+            commands=['show environment']
+        ))
         result = self.execute_module()
-        self.assertEqual(len(result['stdout']), 1)
-        self.assertTrue(result['stdout'][0].startswith('RTX1210'))
+        self.assertEqual(
+            len(result['stdout']),
+            1
+        )
+        self.assertTrue(
+            result['stdout'][0].startswith('RTX1210')
+        )
 
     def test_rtx_command_multiple(self):
-        set_module_args(dict(commands=['show environment', 'show environment']))
+        set_module_args(dict(
+            commands=['show environment', 'show environment']
+        ))
         result = self.execute_module()
-        self.assertEqual(len(result['stdout']), 2)
-        self.assertTrue(result['stdout'][0].startswith('RTX1210'))
+        self.assertEqual(
+            len(result['stdout']),
+            2
+        )
+        self.assertTrue(
+            result['stdout'][0].startswith('RTX1210')
+        )
 
     def test_rtx_command_wait_for(self):
         wait_for = 'result[0] contains "RTX1210"'
-        set_module_args(dict(commands=['show environment'], wait_for=wait_for))
+        set_module_args(dict(
+            commands=['show environment'], wait_for=wait_for
+        ))
         self.execute_module()
 
     def test_rtx_command_wait_for_fails(self):
         wait_for = 'result[0] contains "test string"'
-        set_module_args(dict(commands=['show environment'], wait_for=wait_for))
+        set_module_args(dict(
+            commands=['show environment'], wait_for=wait_for
+        ))
         self.execute_module(failed=True)
-        self.assertEqual(self.run_commands.call_count, 10)
+        self.assertEqual(
+            self.run_commands.call_count,
+            10
+        )
 
     def test_rtx_command_retries(self):
         wait_for = 'result[0] contains "test string"'
-        set_module_args(dict(commands=['show environment'], wait_for=wait_for, retries=2))
+        set_module_args(dict(
+            commands=['show environment'], wait_for=wait_for, retries=2
+        ))
         self.execute_module(failed=True)
-        self.assertEqual(self.run_commands.call_count, 2)
+        self.assertEqual(
+            self.run_commands.call_count,
+            2
+        )
 
     def test_rtx_command_match_any(self):
-        wait_for = ['result[0] contains "RTX1210"',
-                    'result[0] contains "test string"']
-        set_module_args(dict(commands=['show environment'], wait_for=wait_for, match='any'))
+        wait_for = [
+            'result[0] contains "RTX1210"',
+            'result[0] contains "test string"'
+        ]
+        set_module_args(dict(
+            commands=['show environment'], wait_for=wait_for, match='any'
+        ))
         self.execute_module()
 
     def test_rtx_command_match_all(self):
-        wait_for = ['result[0] contains "RTX1210"',
-                    'result[0] contains "Rev.14.01.28"']
-        set_module_args(dict(commands=['show environment'], wait_for=wait_for, match='all'))
+        wait_for = [
+            'result[0] contains "RTX1210"',
+            'result[0] contains "Rev.14.01.28"'
+        ]
+        set_module_args(dict(
+            commands=['show environment'], wait_for=wait_for, match='all'
+        ))
         self.execute_module()
 
     def test_rtx_command_match_all_failure(self):
-        wait_for = ['result[0] contains "RTX1210"',
-                    'result[0] contains "test string"']
+        wait_for = [
+            'result[0] contains "RTX1210"',
+            'result[0] contains "test string"'
+        ]
         commands = ['show environment', 'show environment']
-        set_module_args(dict(commands=commands, wait_for=wait_for, match='all'))
+        set_module_args(dict(
+            commands=commands, wait_for=wait_for, match='all'
+        ))
         self.execute_module(failed=True)
 
     def test_rtx_command_configure_check_warning(self):
@@ -131,6 +189,10 @@ class TestRtxCommandModule(TestRtxModule):
 
     def test_rtx_command_configure_not_warning(self):
         commands = ['administrator']
-        set_module_args(dict(commands=commands))
+        set_module_args(dict(
+            commands=commands
+        ))
         result = self.execute_module()
-        self.assertEqual(result['warnings'], [])
+        self.assertEqual(
+            result['warnings'], []
+        )

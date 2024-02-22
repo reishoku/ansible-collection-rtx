@@ -41,6 +41,7 @@ from ansible.module_utils.connection import Connection, ConnectionError
 
 _DEVICE_CONFIGS = {}
 
+
 def get_connection(module):
     if hasattr(module, '_rtx_connection'):
         return module._rtx_connection
@@ -50,7 +51,9 @@ def get_connection(module):
     if network_api == 'cliconf':
         module._rtx_connection = Connection(module._socket_path)
     else:
-        module.fail_json(msg='Invalid connection type %s' % network_api)
+        module.fail_json(
+            msg='Invalid connection type {}'.format(network_api)
+        )
 
     return module._rtx_connection
 
@@ -61,7 +64,11 @@ def get_capabilities(module):
     try:
         capabilities = Connection(module._socket_path).get_capabilities()
     except ConnectionError as exc:
-        module.fail_json(msg=to_text(exc, errors='surrogate_then_replace'))
+        module.fail_json(
+            msg=to_text(
+                exc,
+                errors='surrogate_then_replace')
+        )
     module._rtx_capabilities = json.loads(capabilities)
     return module._rtx_capabilities
 
@@ -87,11 +94,24 @@ def get_config(module, flags=None):
             out = connection.get_config(flags=flags)
         except ConnectionError as exc:
             if section_filter:
-                module.warn("section %s" % section_filter)
-                out = get_config(module, flags=flags[:-1])
+                module.warn(
+                    'section {}'.format(section_filter)
+                )
+                out = get_config(
+                    module,
+                    flags=flags[:-1]
+                )
             else:
-                module.fail_json(msg=to_text(exc, errors='surrogate_then_replace'))
-        cfg = to_text(out, errors='surrogate_then_replace').strip()
+                module.fail_json(
+                    msg=to_text(
+                        exc,
+                        errors='surrogate_then_replace'
+                    )
+                )
+        cfg = to_text(
+            out,
+            errors='surrogate_then_replace'
+        ).strip()
         _DEVICE_CONFIGS[flag_str] = cfg
         return cfg
 
@@ -99,9 +119,14 @@ def get_config(module, flags=None):
 def run_commands(module, commands, check_rc=True):
     connection = get_connection(module)
     try:
-        return connection.run_commands(commands=commands, check_rc=check_rc)
+        return connection.run_commands(
+            commands=commands,
+            check_rc=check_rc
+        )
     except ConnectionError as exc:
-        module.fail_json(msg=to_text(exc))
+        module.fail_json(
+            msg=to_text(exc)
+        )
 
 
 def load_config(module, commands):
@@ -111,7 +136,9 @@ def load_config(module, commands):
         resp = connection.edit_config(commands)
         return resp.get('response')
     except ConnectionError as exc:
-        module.fail_json(msg=to_text(exc))
+        module.fail_json(
+            msg=to_text(exc)
+        )
 
 
 def get_console_info(module):
@@ -121,18 +148,30 @@ def get_console_info(module):
         'columns': 'no console columns'
     }
 
-    config = run_commands(module, 'show config | grep console')
+    config = run_commands(
+        module,
+        'show config | grep console'
+    )
     config_txt = config[0]
 
-    config_txt_match = re.search(r'(console character (.+))', config_txt)
+    config_txt_match = re.search(
+        r'(console character (.+))',
+        config_txt
+    )
     if config_txt_match:
         console_info['character'] = config_txt_match.group(1)
 
-    config_txt_match = re.search(r'(console lines (.+))', config_txt)
+    config_txt_match = re.search(
+        r'(console lines (.+))',
+        config_txt
+    )
     if config_txt_match:
         console_info['lines'] = config_txt_match.group(1)
 
-    config_txt_match = re.search(r'(console columns (\d{2,}))', config_txt)
+    config_txt_match = re.search(
+        r'(console columns (\d{2,}))',
+        config_txt
+    )
     if config_txt_match:
         console_info['columns'] = config_txt_match.group(1)
 
@@ -142,27 +181,60 @@ def get_console_info(module):
 def set_console_info(module, console_info=None):
     try:
         if console_info:
-            run_commands(module, console_info['character'])
+            run_commands(
+                module,
+                console_info['character']
+            )
         else:
-            run_commands(module, 'console character ascii')
+            run_commands(
+                module,
+                'console character ascii'
+            )
     except ConnectionError as exc:
-        module.fail_json(msg=to_text(exc, errors='unable to set console character'))
+        module.fail_json(
+            msg=to_text(
+                exc,
+                errors='unable to set console character'
+            )
+        )
 
     try:
         if console_info:
-            run_commands(module, console_info['lines'])
+            run_commands(
+                module,
+                console_info['lines']
+            )
         else:
-            run_commands(module, 'console lines infinity')
+            run_commands(
+                module,
+                'console lines infinity'
+            )
     except ConnectionError as exshc:
-        module.fail_json(msg=to_text(exc, errors='unable to set console lines'))
+        module.fail_json(
+            msg=to_text(
+                exc,
+                errors='unable to set console lines'
+            )
+        )
 
     try:
         if console_info:
-            run_commands(module, console_info['columns'])
+            run_commands(
+                module,
+                console_info['columns']
+            )
         else:
-            run_commands(module, 'console columns 200')
+            run_commands(
+                module,
+                'console columns 200'
+            )
     except ConnectionError as exc:
-        module.fail_json(msg=to_text(exc, errors='unable to set console columns'))
+        module.fail_json(
+            msg=to_text(
+                exc,
+                errors='unable to set console columns'
+            )
+        )
 
 
 def update_console_info(commands, console_info):
