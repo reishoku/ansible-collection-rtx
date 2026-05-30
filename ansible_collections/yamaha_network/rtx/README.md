@@ -1,5 +1,8 @@
 # Ansible collection for Yamaha RTX/NVR/FWX/vRX series
 
+> [!CAUTION]
+> This is **unofficial** fork.
+
 ## Modules
 The following Ansible modules are part of this collection.
 
@@ -12,7 +15,7 @@ To install the latest version of this collection, please use the following comma
 `ansible-galaxy collection install yamaha_network.rtx`
 
 ## Requirements
-- Ansible 2.10
+- Ansible Core 2.16 or higher
 
 ## Sample playbook 
 
