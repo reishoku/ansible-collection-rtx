@@ -20,9 +20,9 @@
 
 DOCUMENTATION = """
 module: rtx_command
-version_added: "2.10"
-authors:
-  - Yamaha Corporation
+version_added: "1.0.0"
+author:
+  - Yamaha Corporation (@yamaha-network)
 short_description: Run commands on remote Yamaha RTX/NVR/FWX/vRX devices.
 description:
   - Sends arbitrary commands to an Yamaha RTX/NVR/FWX/vRX device and

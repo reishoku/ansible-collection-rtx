@@ -20,14 +20,13 @@
 
 DOCUMENTATION = """
 ---
-authors:
-  - Yamaha Corporation
-cliconf: rtx
+author:
+  - Yamaha Corporation (@yamaha-network)
 short_description: Use rtx cliconf to run command on Yamaha RTX/NVR/FWX/vRX devices.
 description:
   - This rtx plugin provides low level abstraction apis for
     sending and receiving CLI commands from Yamaha RTX/NVR/FWX/vRX devices.
-version_added: "2.10"
+version_added: "1.0.0"
 """
 
 import re

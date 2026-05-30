@@ -21,9 +21,9 @@
 DOCUMENTATION = """
 ---
 module: rtx_config
-version_added: "2.10"
-authors:
-  - Yamaha Corporation
+version_added: "1.0.0"
+author:
+  - Yamaha Corporation (@yamaha-network)
 short_description: Manage the configuration of Yamaha RTX/NVR/FWX/vRX devices.
 description:
   - This module provides an implementation for manage the configuration
