@@ -18,13 +18,6 @@
 # along with Ansible.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
 #
 
-from __future__ import absolute_import, division, print_function
-
-__metaclass__ = type
-
-ANSIBLE_METADATA = {'metadata_version': '1.1', 'status': ['preview'], 'supported_by': 'community'}
-
-
 DOCUMENTATION = """
 ---
 module: rtx_config
@@ -266,9 +259,8 @@ time:
   type: str
   sample: "12:24:48"
 """
-import json
 
-from ansible.module_utils._text import to_text
+from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.connection import ConnectionError
 from ansible_collections.yamaha_network.rtx.plugins.module_utils.network.rtx.rtx import run_commands, get_config
 from ansible_collections.yamaha_network.rtx.plugins.module_utils.network.rtx.rtx import get_connection

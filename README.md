@@ -21,7 +21,7 @@
 >ansible-galaxy collection install ansible.netcommon
 
 ## Requirements
-- Ansible 2.10
+- Ansible Core 2.16 以上
 
 ### Supported connections
 Yamaha rtx collectionは``network_cli``を用いた接続をサポートします。
