@@ -1,0 +1,20 @@
+
+target-version = "py39"
+line-length = 160
+indent-width = 2
+
+[lint]
+select = ["E", "F", "W", "I", "B", "C4", "PIE"]
+
+[lint.per-file-ignores]
+"ansible_collections/**/plugins/**/**.py" = ["E402"]
+"test/**" = ["E501", "F401", "F811"]
+
+[lint.isort]
+known-first-party = [
+  "ansible_collections"
+]
+
+[format]
+quote-style = "preserve"
+
