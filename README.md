@@ -2,6 +2,9 @@
 
 このリポジトリはヤマハネットワーク製品向けAnsibleモジュールリポジトリです。
 
+> [!CAUTION]
+> このリポジトリは **非公式** フォークです。
+
 ## Modules
 - rtx_command.py-ヤマハ機器(RTX/NVR/FWX/vRX)の実行系コマンドを実行するためのモジュール
 - rtx_config.py-ヤマハ機器(RTX/NVR/FWX/vRX)の設定系コマンドを実行するためのモジュール
