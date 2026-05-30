@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
 #
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 import re
@@ -33,24 +34,21 @@ display = Display()
 
 
 class ActionModule(ActionNetworkModule):
+  def run(self, tmp=None, task_vars=None):
+    del tmp  # tmp no longer has any effect
 
-    def run(self, tmp=None, task_vars=None):
-        del tmp  # tmp no longer has any effect
+    module_name = self._task.action.split('.')[-1]
+    self._config_module = True if module_name in ['rtx_config'] else False
 
-        module_name = self._task.action.split('.')[-1]
-        self._config_module = (
-            True if module_name in ['rtx_config'] else False
-        )
+    socket_path = None
 
-        socket_path = None
+    if self._play_context.connection == 'network_cli':
+      provider = self._task.args.get('provider', {})
+      if any(provider.values()):
+        display.warning('provider is unnecessary when using network_cli and will be ignored')
+        del self._task.args['provider']
+    else:
+      return {'failed': True, 'msg': 'Connection type %s is not valid for this module' % self._play_context.connection}
 
-        if self._play_context.connection == 'network_cli':
-            provider = self._task.args.get('provider', {})
-            if any(provider.values()):
-                display.warning('provider is unnecessary when using network_cli and will be ignored')
-                del self._task.args['provider']
-        else:
-            return {'failed': True, 'msg': 'Connection type %s is not valid for this module' % self._play_context.connection}
-
-        result = super(ActionModule, self).run(task_vars=task_vars)
-        return result
+    result = super(ActionModule, self).run(task_vars=task_vars)
+    return result

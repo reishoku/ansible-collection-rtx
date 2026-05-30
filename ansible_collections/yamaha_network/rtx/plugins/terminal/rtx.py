@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
 #
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 import json
@@ -32,36 +33,33 @@ display = Display()
 
 
 class TerminalModule(TerminalBase):
+  terminal_stdout_re = [re.compile(rb"[>#]|Password: ")]
 
-    terminal_stdout_re = [
-        re.compile(br"[>#]|Password: ")
-    ]
+  terminal_stderr_re = [
+    re.compile(rb"Error:", re.I),
+  ]
 
-    terminal_stderr_re = [
-        re.compile(br"Error:", re.I),
-    ]
+  def on_open_shell(self):
+    pass
 
-    def on_open_shell(self):
-        pass
+  def on_become(self, passwd=None):
+    if self._get_prompt().endswith(b'#'):
+      return
 
-    def on_become(self, passwd=None):
-        if self._get_prompt().endswith(b'#'):
-            return
+    cmd = {'command': 'administrator'}
+    if passwd:
+      cmd['prompt'] = to_text(r"[\r\n]?Password: $", errors='surrogate_or_strict')
+      cmd['answer'] = passwd
+    try:
+      self._exec_cli_command(to_bytes(json.dumps(cmd), errors='surrogate_or_strict'))
+    except AnsibleConnectionFailure:
+      raise AnsibleConnectionFailure('unable to elevate privilege to administrator mode')
 
-        cmd = {u'command': u'administrator'}
-        if passwd:
-            cmd[u'prompt'] = to_text(r"[\r\n]?Password: $", errors='surrogate_or_strict')
-            cmd[u'answer'] = passwd
-        try:
-            self._exec_cli_command(to_bytes(json.dumps(cmd), errors='surrogate_or_strict'))
-        except AnsibleConnectionFailure:
-            raise AnsibleConnectionFailure('unable to elevate privilege to administrator mode')
+  def on_unbecome(self):
+    prompt = self._get_prompt()
+    if prompt is None:
+      # if prompt is None most likely the terminal is hung up at a prompt
+      return
 
-    def on_unbecome(self):
-        prompt = self._get_prompt()
-        if prompt is None:
-            # if prompt is None most likely the terminal is hung up at a prompt
-            return
-
-        if prompt.endswith(b'#'):
-            self._exec_cli_command(b'exit')
+    if prompt.endswith(b'#'):
+      self._exec_cli_command(b'exit')
